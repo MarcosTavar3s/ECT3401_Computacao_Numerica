@@ -73,46 +73,51 @@ def multiplica_em_base_n(e1: str, e2: str, base: int) -> str:
 
     return resultado_final
 
-# cria tabela de equivalência usando somas na base menor
-def cria_tabela_equivalencia_soma(base_maior: int, base_menor: int):
-    
-    # simbolos possiveis para o pior caso (26)
-    simbolos = '0123456789ABCDEFGHIJKLMNOP'
-    digitos_maior = simbolos[:base_maior]
-    
-    tabela = dict()
-
-    # passa por cada algarismo da maior base
-    for i, dig in enumerate(digitos_maior):
-        valor = '0'
-        
-        # preenchimento do dicionario um a um
-        for _ in range(i):
-            valor = soma_em_base_n(valor, '1', base_menor)
-        tabela[dig] = valor
-
-    return tabela
-
-
-def transforma_polinomio(expressao: str, base_destino: int) -> str:
+# transforma o polinomio de Horner em uma lista de valores
+def transforma_polinomio(expressao: str, base_destino: int):
     # separa a expressao em termos: substitui espaços, parentesis e quebra no símbolo de +
     termos = expressao.replace(' ', '').replace('(', '').replace(')', '').split('+')
     
-    # pega a base de origem, ou seja, a que é elevada ao expoente
-    base_origem = int(termos[0].split('**')[0][-1])
-    print(base_origem)
+    # pega a base de origem, ou seja, a que é elevada ao expoente, e realiza casting para int
+    base_origem = int(termos[0].split('**')[0].split('*')[1])
+    
+    # para armazenar os cada numero na base de destino
+    itens = []
     
     for termo in termos:
-        exp_para_multiplicacao(termo, base_origem, base_destino)
+        itens.append(exp_para_multiplicacao(termo, base_origem, base_destino))
     
+    # depuração p ver se está funcionando
+    # print(itens)
+    
+    # soma todos os valores
+    for _ in itens:
+        # remove o ultimo item o soma com o anterior
+        itens[-1] = soma_em_base_n(itens.pop(), itens[-1] , base_destino)
+        
+    # a lista passa a ter um unico item ao final, o resultado :)
+    return itens[0]
+    
+# transforma as exponenciais para multiplicacoes na base final
 def exp_para_multiplicacao(expressao:str, base_origem: int, base_destino: int):
-    print(f"numero: {expressao[0]} expoente: {expressao[-1]}")
+    numero, expoente = expressao.split('**')
+    numero, _ = numero.split('*')
+    print(numero, expoente)
     
-    pass
-
-# transforma_polinomio('(1 * 6 ** 1) + (0 * 6 ** 0)', 12)
-print(multiplica_em_base_n('A', '2', 13))
-# tabela = cria_tabela_equivalencia_soma(26, 5)
-
-# for k, n in tabela.items():
-    # print(f'{k} -> {n}')
+    # numero = expressao[0]
+    # expoente = expressao[-1]
+    
+    # trocar a base de origem por sua representação na base destino 
+    base_origem = soma_em_base_n(str(base_origem), '0', base_destino)        
+    
+    # trocar o numero por sua representação na base destino
+    numero = soma_em_base_n(numero, '0', base_destino)        
+        
+    # vez = 0 Depuracao
+    
+    for _ in range(char_valor(expoente)): 
+        numero = multiplica_em_base_n(numero, base_origem, base_destino)
+        # vez+=1 Depuracao
+        
+    return numero
+    
