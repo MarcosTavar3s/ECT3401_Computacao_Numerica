@@ -1,78 +1,141 @@
-import math
-import numpy as np
-import base_n
-import metodo_alternativo
+# converte caractere para valor 
+def char_valor(c: str) -> int:
+    if c.isdigit():
+        return int(c)
+    return ord(c.upper()) - ord('A') + 10
 
-bases = list(range(2,27))
-# conjunto de caracteres possiveis no pior caso (base 26)
-simbolos = "0123456789ABCDEFGHIJKLMNOP" 
+# converte valor para caractere
+def valor_char(n: int) -> str:
+    if n < 10:
+        return str(n)
+    return chr(ord('A') + n - 10)
 
-print(bases)
-print('Olá! Seja bem-vind@ ao conversor de bases numéricas')
-print('-------------------------------------------------------------------------------------------\n')
-print('Esse programa foi desenvolvido por Marcos Aurélio para a disciplina de Computação Numérica!\n')
-print('-------------------------------------------------------------------------------------------\n')
+# soma duas strings representando números em base n
+def soma_em_base_n(e1: str, e2: str, base: int) -> str:
+    e1 = list(e1.upper())
+    e2 = list(e2.upper())
 
-print('Preenchimento dos números')
-base_origem = int(input('Digite a base do numero inserido: '))
+    tamanho_1 = len(e1)
+    tamanho_2 = len(e2)
 
-while not bases.count(base_origem):
-    base_origem = int(input('A base que você inseriu não está contida no escopo deste programa! Tente novamente!\nAs bases disponíveis são de 2 a 26: '))
+    # supondo que e1 sempre vai ser o maior
+    if tamanho_1 < tamanho_2:
+        e1, e2 = e2, e1
+        tamanho_1, tamanho_2 = tamanho_2, tamanho_1
 
-base_origem_simbolos = list(simbolos[:base_origem])
+    # padroniza tamanho do menor número
+    e2 = ['0'] * (tamanho_1 - tamanho_2) + e2
 
-numero_base_1 = input('Digite o numero: ').upper()
+    resultado = []
+    cin = 0
 
-numero_valido = True
+    for i in range(tamanho_1 - 1, -1, -1):
+        s = char_valor(e1[i]) + char_valor(e2[i]) + cin
+        cin = s // base
+        resultado.append(valor_char(s % base))
 
-for i in numero_base_1:
-    if not base_origem_simbolos.count(i):
-        numero_valido = False
+    if cin > 0:
+        resultado.append(valor_char(cin))
 
-while not numero_valido:
-    numero_base_1 = input('O número escolhido está fora do escopo da base! Tente novamente!\n')
+    # retorna uma string
+    return ''.join(resultado[::-1])
+
+# multiplica dois numeros desde que o numerador seja de um digito
+def multiplica_um_digito(e1: str, d: str, base: int) -> str:
+    qtd_somas = char_valor(d)
+    resultado = '0'
     
-    for i in numero_base_1:
-        if not base_origem_simbolos.count(i):
-            numero_valido = False
-
-
-base_destino =  int(input('Digite a base a qual você deseja converter: '))
-
-while not bases.count(base_destino):
-    base_destino = int(input('A base que você inseriu não está contida no escopo deste programa! Tente novamente!\nAs bases disponíveis são de 2 a 26: '))
-
-if base_origem == base_destino:
-    print(f'As bases são iguais, assim, o número será o mesmo: {numero_base_1}')
-    exit()
-  
-print('\n-------------------------------------------------------------------------------------------\n')
-print('Aplicando o algoritmo...\n')
-print('-------------------------------------------------------------------------------------------\n')
-  
-n = 0 
-numero_em_polinomio = ''
-
-for i in range(len(numero_base_1)):
-    if len(numero_base_1) - (i+1):
-        numero_em_polinomio += f'{numero_base_1[i]}*{base_origem}**{len(numero_base_1) - (i+1)} + '
+    for _ in range(qtd_somas):
+        resultado = soma_em_base_n(resultado, e1, base)
         
+    return resultado
+
+# multiplicacao de dois numeros quaisquer em base n
+def multiplica_em_base_n(e1: str, e2: str, base: int) -> str:
+    e1 = e1.upper()
+    e2 = e2.upper()
+    resultados = []
+
+    # percorre e2 da direita para a esquerda
+    for i, dig in enumerate(reversed(e2)):
+        parcial = multiplica_um_digito(e1, dig, base)
+        
+        # adiciona zeros conforme a posição
+        parcial += '0' * i
+    
+        resultados.append(parcial)
+
+    # soma todas as partes
+    resultado_final = '0'
+    
+    for termo in resultados:
+        resultado_final = soma_em_base_n(resultado_final, termo, base)
+
+    return resultado_final
+
+# converte de uma base A para a base B
+def converte_bases(numero1: str, base_origem: int , base_destino: int):
+    simbolos = '0123456789ABCDEFGHIJKLMNOP'
+    
+    maior_base, menor_base = max(base_origem, base_destino), min(base_origem, base_destino)
+    algarismo_maior = simbolos[:maior_base]
+    
+    # dicionario de equivalências: base maior em base menor
+    dic_eq = {}
+    for i, dig in enumerate(algarismo_maior):
+        valor = '0'
+        for _ in range(i):
+            valor = soma_em_base_n(valor, "1", menor_base)
+        dic_eq[dig] = valor
+    
+    # inverso do dicionario de equivalência: base menor em base maior
+    dic_eq_inv = {v: k for k, v in dic_eq.items()}
+    
+    if base_origem == maior_base:
+        resultado = "0"
+        
+        pot = "1"  # começa com base_origem^0 = 1
+        
+        # começa com o numero menos significativo
+        for dig in reversed(numero1):
+            # valor da base maior na base menor
+            val = dic_eq[dig]
+            
+            # multiplica val * pot
+            soma = "0"
+            
+            for _ in range(int(val, menor_base)):
+                soma = soma_em_base_n(soma, pot, menor_base)
+            
+            # acumula no resultado
+            resultado = soma_em_base_n(resultado, soma, menor_base)
+            
+            # atualiza potência (pot *= base_origem)
+            nova_pot = "0"
+            for _ in range(base_origem):
+                nova_pot = soma_em_base_n(nova_pot, pot, menor_base)
+            pot = nova_pot
+        
+        print(f"{numero1} (base {base_origem}) = {resultado} (base {base_destino})")
+        return resultado
+    
     else:
-        numero_em_polinomio += f'{numero_base_1[i]}*{base_origem}**{len(numero_base_1) - (i+1)}'
-    n += 1
-
-print(f'Escrevendo o numero na base {base_origem} como polinômio: {numero_em_polinomio}\n')
-
-print('-------------------------------------------------------------------------------------------\n')
-
-print(f'Transformando cada termo de {numero_em_polinomio} para a base de destino {base_destino}\n')
-
-print('-------------------------------------------------------------------------------------------\n')
-
-print(f"Número convertido após sucessivas multiplicações e somas feitas na base {base_destino} será:")
-base_n.converte_bases(numero_base_1, base_origem, base_destino)
-print('-------------------------------------------------------------------------------------------\n')
-
-print(f"Número convertido após sucessivas somas feitas nas base {base_destino} será:")
-metodo_alternativo.converte(numero_base_1, base_origem, base_destino)
-print('-------------------------------------------------------------------------------------------\n')
+        # o número está escrito em base menor
+        acumulado = numero1
+        resultado = ""
+        
+        while acumulado != "0":
+            # acha equivalente no dicionário
+            if acumulado in dic_eq_inv:
+                resultado = dic_eq_inv[acumulado] + resultado
+                break
+            
+            # se o algarismo não está previsto na tabela -> achar o  dígito da base maior no acumulado 
+            for simbolo, val in reversed(dic_eq.items()):
+                if int(val, menor_base) <= int(acumulado, menor_base):
+                    resultado = simbolo + resultado
+                    acumulado = format(int(acumulado, menor_base) - int(val, menor_base), f"{menor_base}")
+                    break
+        
+        print(f"{numero1} (base {base_origem}) = {resultado} (base {base_destino})")
+        # return resultado
