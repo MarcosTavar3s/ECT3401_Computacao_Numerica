@@ -1,6 +1,7 @@
 import math
 import numpy as np
 import base_n
+import metodo_alternativo
 
 bases = list(range(2,27))
 # conjunto de caracteres possiveis no pior caso (base 26)
@@ -68,5 +69,10 @@ print(f'Transformando cada termo de {numero_em_polinomio} para a base de destino
 
 print('-------------------------------------------------------------------------------------------\n')
 
-print(f"Número convertido após sucessivas multiplicações e somas feitas na base {base_destino}")
-print(base_n.converte_bases(numero_base_1, base_origem, base_destino))
+print(f"Número convertido após sucessivas multiplicações e somas feitas na base {base_destino} será:")
+base_n.converte_bases(numero_base_1, base_origem, base_destino)
+print('-------------------------------------------------------------------------------------------\n')
+
+print(f"Número convertido após sucessivas somas feitas nas base {base_destino} será:")
+metodo_alternativo.converte(numero_base_1, base_origem, base_destino)
+print('-------------------------------------------------------------------------------------------\n')
