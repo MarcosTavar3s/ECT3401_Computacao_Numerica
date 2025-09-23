@@ -52,3 +52,4 @@ def converte(numero1: str, base_origem: int, base_destino: int):
         print(f'Numero na base {base_origem}: {n_aux}, Numero na base {base_destino}:{n_destino}')
 
     print(n_destino)
+    print(f'{numero1} (base {base_origem}) = {n_destino} (base {base_destino})')
