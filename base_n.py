@@ -138,7 +138,7 @@ def converte_bases(numero1: str, base_origem: int , base_destino: int):
                     break
         
         print(f"{numero1} (base {base_origem}) = {resultado} (base {base_destino})")
-        return resultado
+        # return resultado
 
 # depuracao
 # converte_bases('1A', 15, 26)
