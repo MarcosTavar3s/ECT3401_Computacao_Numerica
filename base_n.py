@@ -75,49 +75,73 @@ def multiplica_em_base_n(e1: str, e2: str, base: int) -> str:
 
 # transforma o polinomio de Horner em uma lista de valores
 def transforma_polinomio(expressao: str, base_destino: int):
-    # separa a expressao em termos: substitui espaços, parentesis e quebra no símbolo de +
-    termos = expressao.replace(' ', '').replace('(', '').replace(')', '').split('+')
+    expressao.split()
+    pass    
+
+def converte_bases(numero1: str, base_origem: int , base_destino: int):
+    simbolos = '0123456789ABCDEFGHIJKLMNOP'
     
-    # pega a base de origem, ou seja, a que é elevada ao expoente, e realiza casting para int
-    base_origem = int(termos[0].split('**')[0].split('*')[1])
+    maior_base, menor_base = max(base_origem, base_destino), min(base_origem, base_destino)
+    algarismo_maior = simbolos[:maior_base]
     
-    # para armazenar os cada numero na base de destino
-    itens = []
+    # dicionario de equivalências: base maior em base menor
+    dic_eq = {}
+    for i, dig in enumerate(algarismo_maior):
+        valor = '0'
+        for _ in range(i):
+            valor = soma_em_base_n(valor, "1", menor_base)
+        dic_eq[dig] = valor
     
-    for termo in termos:
-        itens.append(exp_para_multiplicacao(termo, base_origem, base_destino))
+    # inverso do dicionario de equivalência: base menor em base maior
+    dic_eq_inv = {v: k for k, v in dic_eq.items()}
     
-    # depuração p ver se está funcionando
-    # print(itens)
-    
-    # soma todos os valores
-    for _ in itens:
-        # remove o ultimo item o soma com o anterior
-        itens[-1] = soma_em_base_n(itens.pop(), itens[-1] , base_destino)
+    if base_origem == maior_base:
+        resultado = "0"
         
-    # a lista passa a ter um unico item ao final, o resultado :)
-    return itens[0]
-    
-# transforma as exponenciais para multiplicacoes na base final
-def exp_para_multiplicacao(expressao:str, base_origem: int, base_destino: int):
-    numero, expoente = expressao.split('**')
-    numero, _ = numero.split('*')
-    print(numero, expoente)
-    
-    # numero = expressao[0]
-    # expoente = expressao[-1]
-    
-    # trocar a base de origem por sua representação na base destino 
-    base_origem = soma_em_base_n(str(base_origem), '0', base_destino)        
-    
-    # trocar o numero por sua representação na base destino
-    numero = soma_em_base_n(numero, '0', base_destino)        
+        pot = "1"  # começa com base_origem^0 = 1
         
-    # vez = 0 Depuracao
-    
-    for _ in range(char_valor(expoente)): 
-        numero = multiplica_em_base_n(numero, base_origem, base_destino)
-        # vez+=1 Depuracao
+        # começa com o numero menos significativo
+        for dig in reversed(numero1):
+            # valor da base maior na base menor
+            val = dic_eq[dig]
+            
+            # multiplica val * pot
+            soma = "0"
+            
+            for _ in range(int(val, menor_base)):
+                soma = soma_em_base_n(soma, pot, menor_base)
+            
+            # acumula no resultado
+            resultado = soma_em_base_n(resultado, soma, menor_base)
+            
+            # atualiza potência (pot *= base_origem)
+            nova_pot = "0"
+            for _ in range(base_origem):
+                nova_pot = soma_em_base_n(nova_pot, pot, menor_base)
+            pot = nova_pot
         
-    return numero
+        print(f"{numero1} (base {base_origem}) = {resultado} (base {base_destino})")
+        return resultado
     
+    else:
+        # o número está escrito em base menor
+        acumulado = numero1
+        resultado = ""
+        
+        while acumulado != "0":
+            # acha equivalente no dicionário
+            if acumulado in dic_eq_inv:
+                resultado = dic_eq_inv[acumulado] + resultado
+                break
+            
+            # se o algarismo não está previsto na tabela -> achar o  dígito da base maior no acumulado 
+            for simbolo, val in reversed(dic_eq.items()):
+                if int(val, menor_base) <= int(acumulado, menor_base):
+                    resultado = simbolo + resultado
+                    acumulado = format(int(acumulado, menor_base) - int(val, menor_base), f"{menor_base}")
+                    break
+        
+        print(f"{numero1} (base {base_origem}) = {resultado} (base {base_destino})")
+        return resultado
+
+# converte_bases('1A', 15, 26)
