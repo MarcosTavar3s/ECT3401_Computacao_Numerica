@@ -73,11 +73,7 @@ def multiplica_em_base_n(e1: str, e2: str, base: int) -> str:
 
     return resultado_final
 
-# transforma o polinomio de Horner em uma lista de valores
-def transforma_polinomio(expressao: str, base_destino: int):
-    expressao.split()
-    pass    
-
+# converte de uma base A para a base B
 def converte_bases(numero1: str, base_origem: int , base_destino: int):
     simbolos = '0123456789ABCDEFGHIJKLMNOP'
     
@@ -144,4 +140,5 @@ def converte_bases(numero1: str, base_origem: int , base_destino: int):
         print(f"{numero1} (base {base_origem}) = {resultado} (base {base_destino})")
         return resultado
 
+# depuracao
 # converte_bases('1A', 15, 26)
