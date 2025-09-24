@@ -38,8 +38,21 @@ def soma_em_base_n(e1: str, e2: str, base: int) -> str:
         resultado.append(valor_char(cin))
 
     # retorna uma string
-    return ''.join(resultado[::-1])
+    return ''.join(resultado[::-1]) 
 
+def multiplica_em_base_n(numero1: str, numero2: str, base: int):
+    num_aux = '0'
+    num_total = '0'
+    
+    while num_aux!=numero2:
+        num_vezes = '0'
+        while num_vezes!= numero1:
+           num_vezes = soma_em_base_n(num_vezes, '1', base)
+           num_total = soma_em_base_n(num_total, '1', base)
+        
+        num_aux = soma_em_base_n(num_aux,'1', base)
+    
+    return num_total
 
 def converte(numero1: str, base_origem: int, base_destino: int):
     n_aux = '0'
@@ -51,5 +64,6 @@ def converte(numero1: str, base_origem: int, base_destino: int):
         
         print(f'Numero na base {base_origem}: {n_aux}, Numero na base {base_destino}:{n_destino}')
 
-    print(n_destino)
-    print(f'{numero1} (base {base_origem}) = {n_destino} (base {base_destino})')
+    # print(f'Numero convertido:{n_destino}')
+    print(f"{numero1} (base {base_origem}) = {n_destino} (base {base_destino})")
+
