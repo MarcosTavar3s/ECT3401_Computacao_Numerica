@@ -38,20 +38,9 @@ if operacao == 1:
 
     numero_base_1 = input('Digite o numero: ').upper()
 
-    numero_valido = True
-
-    for i in numero_base_1:
-        if not base_origem_simbolos.count(i):
-            numero_valido = False
-
-    while not numero_valido:
+    while not metodo_alternativo.valida(numero_base_1, base_origem):
         numero_base_1 = input('O número escolhido está fora do escopo da base! Tente novamente!\n')
-        numero_valido = True
-        for i in numero_base_1:
-            if not base_origem_simbolos.count(i):
-                numero_valido = False
-
-
+        
     base_destino =  int(input('Digite a base a qual você deseja converter: '))
 
     while not bases.count(base_destino):
@@ -94,7 +83,14 @@ elif operacao == 2:
     print('-------------------------------------------------------------------------------------------\n')
     base = int(input('Digite a base: '))
     n1 = input('Digite o numero 01: ')
+
+    while not metodo_alternativo.valida(n1, base):
+        n1 = input(f'O número escolhido está fora do escopo da base {base}! Tente novamente!\n')
+
     n2 = input('Digite o numero 02: ')
+    while not metodo_alternativo.valida(n1, base):
+        n1 = input(f'O número escolhido está fora do escopo da base {base}! Tente novamente!\n')
+
     
     print('-------------------------------------------------------------------------------------------\n')
     print(f"Resultado obtido após a aplicação de somas na base {base} será: ")
@@ -108,8 +104,16 @@ elif operacao == 3:
     print('Operação de multiplicação selecionada com sucesso\n')
     print('-------------------------------------------------------------------------------------------\n')
     base = int(input('Digite a base: '))
+    
     n1 = input('Digite o numero 01: ')
+    while not metodo_alternativo.valida(n1, base):
+        n1 = input(f'O número escolhido está fora do escopo da base {base}! Tente novamente!\n')
+        
     n2 = input('Digite o numero 02: ')
+    while not metodo_alternativo.valida(n2, base):
+        n2 = input(f'O número escolhido está fora do escopo da base {base}! Tente novamente!\n')
+
+
     # print(base_n.multiplica_em_base_n(n1, n2, base) + f' (base {base})')
     print(metodo_alternativo.multiplica_em_base_n(n1, n2, base) + f' (base {base})')
     print('-------------------------------------------------------------------------------------------\n')
