@@ -40,6 +40,7 @@ def soma_em_base_n(e1: str, e2: str, base: int) -> str:
     # retorna uma string
     return ''.join(resultado[::-1]) 
 
+# multiplica em base n
 def multiplica_em_base_n(numero1: str, numero2: str, base: int):
     num_aux = '0'
     num_total = '0'
@@ -54,6 +55,7 @@ def multiplica_em_base_n(numero1: str, numero2: str, base: int):
     
     return num_total
 
+# converte de uma base para a outra
 def converte(numero1: str, base_origem: int, base_destino: int):
     n_aux = '0'
     n_destino = '0'
@@ -67,3 +69,16 @@ def converte(numero1: str, base_origem: int, base_destino: int):
     # print(f'Numero convertido:{n_destino}')
     print(f"{numero1} (base {base_origem}) = {n_destino} (base {base_destino})")
 
+# valida se o numero pertence à base ou não
+def valida(numero:str, base:int):
+    simbolos = "0123456789ABCDEFGHIJKLMNOP" 
+    base_simbolos = simbolos[:base]
+    
+    numero_valido = True
+    
+    for i in numero:
+        if not base_simbolos.count(i):
+            numero_valido = False
+
+    return numero_valido
+    
