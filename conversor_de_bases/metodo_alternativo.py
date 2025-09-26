@@ -57,6 +57,7 @@ def multiplica_em_base_n(numero1: str, numero2: str, base: int):
 
 # converte de uma base para a outra
 def converte(numero1: str, base_origem: int, base_destino: int):
+    numero1 = numero1.upper()
     n_aux = '0'
     n_destino = '0'
     
