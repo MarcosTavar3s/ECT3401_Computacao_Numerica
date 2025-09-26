@@ -42,6 +42,8 @@ def soma_em_base_n(e1: str, e2: str, base: int) -> str:
 
 # multiplica em base n
 def multiplica_em_base_n(numero1: str, numero2: str, base: int):
+    numero1 = numero1.upper()
+    numero2 = numero2.upper()
     num_aux = '0'
     num_total = '0'
     
