@@ -74,6 +74,7 @@ def valida(numero:str, base:int):
     simbolos = "0123456789ABCDEFGHIJKLMNOP" 
     base_simbolos = simbolos[:base]
     
+    numero = numero.upper()
     numero_valido = True
     
     for i in numero:
