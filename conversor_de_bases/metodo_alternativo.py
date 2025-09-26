@@ -47,6 +47,39 @@ def multiplica_em_base_n(numero1: str, numero2: str, base: int):
     num_aux = '0'
     num_total = '0'
     
+    cont = 0
+     
+    primeiro_nao_zero = False
+    copia_n1 = None
+    
+    for i in numero1:
+        if i != '0' and not primeiro_nao_zero:
+           primeiro_nao_zero = True 
+        
+        if not primeiro_nao_zero and i=='0':
+            copia_n1 = numero1[cont+1:]
+            
+        cont+=1
+    
+    if copia_n1 is not None:
+        numero1 = copia_n1
+
+    primeiro_nao_zero = False
+    cont = 0
+    copia_n2 = None
+    
+    for i in numero2:
+        if i != '0' and not primeiro_nao_zero:
+           primeiro_nao_zero = True 
+        
+        if not primeiro_nao_zero and i=='0':
+            copia_n2 = numero2[cont+1:]
+            
+        cont+=1
+    
+    if copia_n2 is not None:
+        numero2 = copia_n2
+    
     while num_aux!=numero2:
         num_vezes = '0'
         while num_vezes!= numero1:
@@ -59,9 +92,25 @@ def multiplica_em_base_n(numero1: str, numero2: str, base: int):
 
 # converte de uma base para a outra
 def converte(numero1: str, base_origem: int, base_destino: int):
+    cont = 0
     numero1 = numero1.upper()
     n_aux = '0'
     n_destino = '0'
+    
+    primeiro_nao_zero = False
+    copia_n1 = None
+    
+    for i in numero1:
+        if i != '0' and not primeiro_nao_zero:
+           primeiro_nao_zero = True 
+        
+        if not primeiro_nao_zero and i=='0':
+            copia_n1 = numero1[cont+1:]
+            
+        cont+=1
+    
+    if copia_n1 is not None:
+        numero1 = copia_n1
     
     while n_aux != numero1:
         n_aux = soma_em_base_n(n_aux, '1', base_origem)
