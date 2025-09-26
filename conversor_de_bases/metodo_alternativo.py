@@ -1,137 +1,166 @@
-# converte caractere para valor 
 def char_valor(c: str) -> int:
     if c.isdigit():
         return int(c)
     return ord(c.upper()) - ord('A') + 10
 
-# converte valor para caractere
 def valor_char(n: int) -> str:
     if n < 10:
         return str(n)
     return chr(ord('A') + n - 10)
 
-# soma duas strings representando números em base n
 def soma_em_base_n(e1: str, e2: str, base: int) -> str:
-    e1 = list(e1.upper())
-    e2 = list(e2.upper())
+    e1 = e1.upper()
+    e2 = e2.upper()
 
-    tamanho_1 = len(e1)
-    tamanho_2 = len(e2)
+    # separa as partes 
+    if '.' in e1: 
+        parte_int1, parte_frac1 = e1.split('.')
+    else:
+        parte_int1, parte_frac1 = e1, ''
+    
+    if '.' in e2:
+        parte_int2, parte_frac2 = e2.split('.')
+    else:
+        parte_int2, parte_frac2 = e2, ''
 
-    # supondo que e1 sempre vai ser o maior
-    if tamanho_1 < tamanho_2:
-        e1, e2 = e2, e1
-        tamanho_1, tamanho_2 = tamanho_2, tamanho_1
+    # padroniza tamanho das partes
+    max_frac = max(len(parte_frac1), len(parte_frac2))
+    
+    # parte e preenchido com zeros para a operacao dar certo
+    parte_frac1 = parte_frac1.ljust(max_frac, '0')
+    parte_frac2 = parte_frac2.ljust(max_frac, '0')
 
-    # padroniza tamanho do menor número
-    e2 = ['0'] * (tamanho_1 - tamanho_2) + e2
-
-    resultado = []
+    # soma parte fracionária
+    resultado_frac = []
+    
+    # lembrei de circuitos digitais
     cin = 0
-
-    for i in range(tamanho_1 - 1, -1, -1):
-        s = char_valor(e1[i]) + char_valor(e2[i]) + cin
+    
+    for i in range(max_frac - 1, -1, -1):
+        s = char_valor(parte_frac1[i]) + char_valor(parte_frac2[i]) + cin
         cin = s // base
-        resultado.append(valor_char(s % base))
+        resultado_frac.append(valor_char(s % base))
+    resultado_frac = ''.join(resultado_frac[::-1])
+
+
+    # soma parte inteira
+    parte_int1 = list(parte_int1.zfill(max(len(parte_int1), len(parte_int2))))
+    parte_int2 = list(parte_int2.zfill(max(len(parte_int1), len(parte_int2))))
+
+    resultado_int = []
+    for i in range(len(parte_int1) - 1, -1, -1):
+        s = char_valor(parte_int1[i]) + char_valor(parte_int2[i]) + cin
+        cin = s // base
+        resultado_int.append(valor_char(s % base))
 
     if cin > 0:
-        resultado.append(valor_char(cin))
+        resultado_int.append(valor_char(cin))
 
-    # retorna uma string
-    return ''.join(resultado[::-1]) 
+    resultado_int = ''.join(resultado_int[::-1])
 
-# multiplica em base n
-def multiplica_em_base_n(numero1: str, numero2: str, base: int):
-    numero1 = numero1.upper()
-    numero2 = numero2.upper()
-    num_aux = '0'
-    num_total = '0'
+    # se tem parte fracionaria, vai juntar tudo
+    if max_frac > 0:
+        return resultado_int + '.' + resultado_frac
+    return resultado_int
+
+# multiplica em uma base qualquer
+def multiplica_em_base_n(e1: str, e2: str, base: int) -> str:
+    e1 = e1.upper()
+    e2 = e2.upper()
+
+    # conta casas decimais
+    casas1 = len(e1.split('.')[1]) if '.' in e1 else 0
+    casas2 = len(e2.split('.')[1]) if '.' in e2 else 0
+    # na multiplicacao a quantidade de casas corresponde a soma dos digitos ou uma unidade a mais
+    total_casas = casas1 + casas2
+
+    # troca ponto por um espaco em branco
+    e1 = e1.replace('.', '')
+    e2 = e2.replace('.', '')
+
+    # multiplicação por somas sucessivas
+    resultado = "0"
     
-    cont = 0
-     
-    primeiro_nao_zero = False
-    copia_n1 = None
-    
-    for i in numero1:
-        if i != '0' and not primeiro_nao_zero:
-           primeiro_nao_zero = True 
+    # inverte porque vai usar as somas
+    for i, dig2 in enumerate(e2[::-1]):
+        parcial = "0"
         
-        if not primeiro_nao_zero and i=='0':
-            copia_n1 = numero1[cont+1:]
+        for _ in range(char_valor(dig2)):
+            parcial = soma_em_base_n(parcial, e1, base)
+        
+        # deslocar para o numero ficar certo
+        if parcial != "0":
+            parcial += "0" * i
+        resultado = soma_em_base_n(resultado, parcial, base)
+
+    # necessidade de colocar os pontos na multiplicacao
+    if total_casas > 0:
+        if len(resultado) <= total_casas:
+            resultado = "0" * (total_casas - len(resultado) + 1) + resultado
             
-        cont+=1
-    
-    if copia_n1 is not None:
-        numero1 = copia_n1
+        sresultado = resultado[:-total_casas] + "." + resultado[-total_casas:]
 
-    primeiro_nao_zero = False
-    cont = 0
-    copia_n2 = None
-    
-    for i in numero2:
-        if i != '0' and not primeiro_nao_zero:
-           primeiro_nao_zero = True 
-        
-        if not primeiro_nao_zero and i=='0':
-            copia_n2 = numero2[cont+1:]
-            
-        cont+=1
-    
-    if copia_n2 is not None:
-        numero2 = copia_n2
-    
-    while num_aux!=numero2:
-        num_vezes = '0'
-        while num_vezes!= numero1:
-           num_vezes = soma_em_base_n(num_vezes, '1', base)
-           num_total = soma_em_base_n(num_total, '1', base)
-        
-        num_aux = soma_em_base_n(num_aux,'1', base)
-    
-    return num_total
+    return sresultado.strip('.')
 
 # converte de uma base para a outra
-def converte(numero1: str, base_origem: int, base_destino: int):
-    cont = 0
-    numero1 = numero1.upper()
-    n_aux = '0'
-    n_destino = '0'
-    
-    primeiro_nao_zero = False
-    copia_n1 = None
-    
-    for i in numero1:
-        if i != '0' and not primeiro_nao_zero:
-           primeiro_nao_zero = True 
-        
-        if not primeiro_nao_zero and i=='0':
-            copia_n1 = numero1[cont+1:]
-            
-        cont+=1
-    
-    if copia_n1 is not None:
-        numero1 = copia_n1
-    
-    while n_aux != numero1:
-        n_aux = soma_em_base_n(n_aux, '1', base_origem)
-        n_destino = soma_em_base_n(n_destino, '1', base_destino)
-        
-        print(f'Numero na base {base_origem}: {n_aux}, Numero na base {base_destino}:{n_destino}')
-
-    # print(f'Numero convertido:{n_destino}')
-    print(f"{numero1} (base {base_origem}) = {n_destino} (base {base_destino})")
-
-# valida se o numero pertence à base ou não
-def valida(numero:str, base:int):
-    simbolos = "0123456789ABCDEFGHIJKLMNOP" 
-    base_simbolos = simbolos[:base]
-    
+def converte(numero: str, base_origem: int, base_destino: int, precisao: int = 10) -> str:
+    # converte de base_origem 
     numero = numero.upper()
-    numero_valido = True
     
-    for i in numero:
-        if not base_simbolos.count(i):
-            numero_valido = False
+    if '.' in numero:
+        print('abc')
+        parte_int, parte_frac = numero.split('.')
+    else:
+        parte_int, parte_frac = numero, ''
 
-    return numero_valido
-    
+    # parte inteira
+    valor = 0
+    potencia = 1
+    for d in parte_int[::-1]:
+        valor += char_valor(d) * potencia
+        potencia *= base_origem
+
+    # parte fracionária
+    frac_valor = 0
+    potencia = base_origem
+    for d in parte_frac:
+        frac_valor += char_valor(d) / potencia
+        potencia *= base_origem
+
+    valor_total = valor + frac_valor
+
+    # converte para base_destino
+    parte_int = int(valor_total)
+    parte_frac = valor_total - parte_int
+
+    # parte inteira
+    if parte_int == 0:
+        res_int = "0"
+    else:
+        res_int = ""
+        while parte_int > 0:
+            res_int = valor_char(parte_int % base_destino) + res_int
+            parte_int //= base_destino
+
+    # parte fracionária
+    res_frac = ""
+    cont = 0
+    while parte_frac > 0 and cont < precisao:
+        parte_frac *= base_destino
+        digito = int(parte_frac)
+        res_frac += valor_char(digito)
+        parte_frac -= digito
+        cont += 1
+
+    if res_frac:
+        return res_int + "." + res_frac
+    return res_int
+
+
+# valida se o numero pertence à base ou não 
+# def valida(numero: str, base: int) -> bool:
+#     simbolos = "0123456789ABCDEFGHIJKLMNOP"
+#     base_simbolos = simbolos[:base]
+#     numero = numero.upper().replace('.', '')  # ignora ponto decimal
+#     # print(all(c in base_simbolos for c in numero))
+#     return all(c in base_simbolos for c in numero)
